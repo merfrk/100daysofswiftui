@@ -12,6 +12,7 @@ struct ContentView: View {
     @State private var usedWords = [String]()
     @State private var rootWord = ""
     @State private var newWord = ""
+    @State private var score = 0
     
     @State private var errorTitle = ""
     @State private var errorMessage = ""
@@ -20,6 +21,11 @@ struct ContentView: View {
     var body: some View {
         NavigationStack{
             List{
+                Section{
+                    Text("Score: \(score)")
+                        .font(.headline)
+                }
+               
                 Section{
                     TextField("Enter your word", text: $newWord)
                         .textInputAutocapitalization(.never)
@@ -35,6 +41,15 @@ struct ContentView: View {
                 }
             }
             .navigationTitle(rootWord)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        startGame()
+                    } label: {
+                        Image(systemName: "arrow.clockwise")
+                    }
+                }
+            }
             .onSubmit { addNewWord()}
             .onAppear(perform: startGame)
             .alert(errorTitle, isPresented: $showingError){
@@ -62,13 +77,20 @@ struct ContentView: View {
             wordError(title: "Word not recognized", message: "You can't just make them up, you know!")
             return
         }
+        guard isValid(word: answer) else {
+            wordError(title: "Word is to short or is just the start word", message: "do better")
+            return
+        }
         
         withAnimation{
             usedWords.insert(answer, at: 0)
+            score += 1
         }
         newWord = ""
         
     }
+    
+    
     func startGame() {
         // 1. Find the URL for start.txt in our app bundle
         if let startWordsURL = Bundle.main.url(forResource: "start", withExtension: "txt") {
@@ -80,6 +102,8 @@ struct ContentView: View {
                 // 4. Pick one random word, or use "silkworm" as a sensible default
                 rootWord = allWords.randomElement() ?? "silkworm"
 
+                usedWords = []
+                score = 0
                 // If we are here everything has worked, so we can exit
                 return
             }
@@ -91,6 +115,11 @@ struct ContentView: View {
     func isOriginal(word: String) -> Bool{
         !usedWords.contains(word)
     }
+    
+    func isValid(word: String) -> Bool{
+        word.count < 3 ? false : word == rootWord ? false : true
+    }
+    
     func isPossible(word: String) -> Bool{
         var tempWord = rootWord
         for letter in word{
