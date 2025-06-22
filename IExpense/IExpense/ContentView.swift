@@ -14,6 +14,42 @@ struct ExpenseItem: Identifiable, Codable{
     let amount: Double
 }
 
+struct ExpenseRow: View {
+    let item: ExpenseItem
+
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading) {
+                Text(item.name)
+                    .font(.headline)
+                Text(item.type)
+            }
+
+            Spacer()
+            Text(item.amount, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
+                .foregroundColor(amountColor(for: item.amount))
+                .font(amountFont(for: item.amount))
+        }
+    }
+
+    func amountColor(for amount: Double) -> Color {
+        switch amount {
+        case ..<10: return .green
+        case ..<100: return .orange
+        default: return .red
+        }
+    }
+
+    func amountFont(for amount: Double) -> Font {
+        switch amount {
+        case ..<10: return .body
+        case ..<100: return .headline
+        default: return .title3.weight(.bold)
+        }
+    }
+}
+
+
 @Observable
 class Expenses{
     var items = [ExpenseItem](){
@@ -40,36 +76,39 @@ struct ContentView: View {
     @State private var expenses = Expenses()
     @State private var showingAddExpense = false
     
+    
+    
     var body: some View {
         NavigationStack {
-            List {
-                ForEach(expenses.items) { item in
-                    HStack {
-                           VStack(alignment: .leading) {
-                               Text(item.name)
-                                   .font(.headline)
-                               Text(item.type)
-                           }
+                List {
+                    Section("Business") {
+                        ForEach(businessItems) { item in
+                            ExpenseRow(item: item)
+                        }
+                        .onDelete { offsets in
+                            removeItems(at: offsets, in: businessItems)
+                        }
+                    }
 
-                           Spacer()
-                        Text(item.amount, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
-                            .foregroundColor(amountColor(for: item.amount))
-                                .font(amountFont(for: item.amount))
-
-                       }
+                    Section("Personal") {
+                        ForEach(personalItems) { item in
+                            ExpenseRow(item: item)
+                        }
+                        .onDelete { offsets in
+                            removeItems(at: offsets, in: personalItems)
+                        }
+                    }
                 }
-                .onDelete(perform: removeItems)
-            }
-            .navigationTitle("iExpense")
-            .toolbar {
-                Button("Add Expense", systemImage: "plus") {
-                    showingAddExpense = true
+                .navigationTitle("iExpense")
+                .toolbar {
+                    Button("Add Expense", systemImage: "plus") {
+                        showingAddExpense = true
+                    }
+                }
+                .sheet(isPresented: $showingAddExpense){
+                    AddView(expenses: expenses)
                 }
             }
-            .sheet(isPresented: $showingAddExpense){
-                AddView(expenses: expenses)
-            }
-        }
     }
     func removeItems(at offsets: IndexSet){
         expenses.items.remove(atOffsets: offsets)
@@ -95,6 +134,22 @@ struct ContentView: View {
             return .title3.weight(.bold)
         }
     }
+    var businessItems: [ExpenseItem] {
+        expenses.items.filter { $0.type == "Business" }
+    }
+
+    var personalItems: [ExpenseItem] {
+        expenses.items.filter { $0.type == "Personal" }
+    }
+
+    func removeItems(at offsets: IndexSet, in items: [ExpenseItem]) {
+        for offset in offsets {
+            if let index = expenses.items.firstIndex(where: { $0.id == items[offset].id }) {
+                expenses.items.remove(at: index)
+            }
+        }
+    }
+
 
 }
 
