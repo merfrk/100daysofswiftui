@@ -6,13 +6,8 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		FC83EF142E0B0938009CB8EB /* ColorTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC83EF132E0B0938009CB8EB /* ColorTheme.swift */; };
-/* End PBXBuildFile section */
-
 /* Begin PBXFileReference section */
 		FC83EEDE2E0ABB15009CB8EB /* MoonShot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MoonShot.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		FC83EF132E0B0938009CB8EB /* ColorTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorTheme.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -37,7 +32,6 @@
 		FC83EED52E0ABB15009CB8EB = {
 			isa = PBXGroup;
 			children = (
-				FC83EF132E0B0938009CB8EB /* ColorTheme.swift */,
 				FC83EEE02E0ABB15009CB8EB /* MoonShot */,
 				FC83EEDF2E0ABB15009CB8EB /* Products */,
 			);
@@ -125,7 +119,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FC83EF142E0B0938009CB8EB /* ColorTheme.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
