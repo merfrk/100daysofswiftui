@@ -71,15 +71,11 @@ struct MissionItemView: View {
 
     Group {
         MissionItemView(mission: sampleMission, isGrid: true)
-            .previewDisplayName("Grid View")
             .padding()
-            .previewLayout(.sizeThatFits)
             .background(.darkBackground)
 
         MissionItemView(mission: sampleMission, isGrid: false)
-            .previewDisplayName("List View")
             .padding()
-            .previewLayout(.sizeThatFits)
             .background(.darkBackground)
     }
 }
