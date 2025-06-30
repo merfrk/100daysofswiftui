@@ -26,6 +26,7 @@ struct ContentView: View {
 
                     Stepper("Number of cakes: \(order.quantity)", value: $order.quantity, in: 3...20)
                 }
+                
                 Section {
                     Toggle("Any special requests?", isOn: $order.specialRequestEnabled)
 
