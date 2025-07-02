@@ -22,7 +22,7 @@ struct CheckoutView: View {
                             .resizable()
                             .scaledToFit()
                 } placeholder: {
-                    ProgressView()
+                    ProgressView("Loading....")
                 }
                 .frame(height: 233)
 
@@ -49,34 +49,48 @@ struct CheckoutView: View {
     }
     func placeOrder() async {
         guard let encoded = try? JSONEncoder().encode(order) else {
-                confirmationMessage = "Failed to encode order."
+            confirmationMessage = "Failed to encode your order. Please try again."
+            showingConfirmation = true
+            return
+        }
+
+        let url = URL(string: "https://reqres.in/api/cupcakes")!
+        var request = URLRequest(url: url)
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        // Bu satırı yorum satırı yaparak isteği bilinçli olarak bozabilirsin:
+         request.httpMethod = "POST"
+
+        do {
+            let (data, response) = try await URLSession.shared.upload(for: request, from: encoded)
+            
+            // Opsiyonel: HTTP response kontrolü
+            if let httpResponse = response as? HTTPURLResponse, !(200...299).contains(httpResponse.statusCode) {
+                confirmationMessage = "Server error: \(httpResponse.statusCode). Please try again later."
                 showingConfirmation = true
                 return
             }
 
-            let url = URL(string: "https://reqres.in/api/cupcakes")!
-            var request = URLRequest(url: url)
-            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.httpMethod = "POST"
-
-            do {
-                let (data, _) = try await URLSession.shared.upload(for: request, from: encoded)
-
-                // Gelen veriyi yazdır (debug için)
-                if let responseString = String(data: data, encoding: .utf8) {
-                    print("Server response:\n\(responseString)")
-                }
-
-                // DOĞRUDAN KENDİ ORDER’INI KULLAN
-                confirmationMessage = "Your order for \(order.quantity)x \(Order.types[order.type].lowercased()) cupcakes is on its way!"
-                showingConfirmation = true
-
-            } catch {
-                confirmationMessage = "Checkout failed: \(error.localizedDescription)"
-                showingConfirmation = true
+            if let responseString = String(data: data, encoding: .utf8) {
+                print("Server response:\n\(responseString)")
             }
-        
+
+            confirmationMessage = "Your order for \(order.quantity)x \(Order.types[order.type].lowercased()) cupcakes is on its way!"
+            showingConfirmation = true
+
+        } catch {
+            print("Upload failed with error: \(error.localizedDescription)")
+
+            // Daha açıklayıcı hata mesajı
+            confirmationMessage = """
+            Your order could not be placed.
+            Please check your internet connection and try again.
+            Error: \(error.localizedDescription)
+            """
+            showingConfirmation = true
+        }
     }
+
 }
 
 #Preview {

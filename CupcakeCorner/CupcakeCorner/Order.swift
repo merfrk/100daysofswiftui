@@ -43,10 +43,13 @@ class Order: Codable {
     var zip = ""
     
     var hasValidAddress: Bool{
-        if name.isEmpty || streetAddress.isEmpty || city.isEmpty || zip.isEmpty {
-            return false
-        }
-        return true
+        if name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
+               streetAddress.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
+               city.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
+               zip.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                return false
+            }
+            return true
     }
     var cost: Decimal {
         // $2 per cake
