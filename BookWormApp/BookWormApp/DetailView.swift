@@ -35,8 +35,13 @@ struct DetailView: View {
                 .font(.title)
                 .foregroundStyle(.secondary)
 
-            Text(book.review)
+            Text(book.review.isEmpty ? "No review provided." : book.review)
                 .padding()
+            
+            Text("Added on \(book.date.formatted(date: .long, time: .shortened))")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .padding(.top, 4)
 
             RatingView(rating: .constant(book.rating))
                 .font(.largeTitle)

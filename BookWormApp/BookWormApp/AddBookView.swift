@@ -42,10 +42,19 @@ struct AddBookView: View {
 
                 Section {
                     Button("Save") {
-                        let newBook = Book(title: title, author: author, genre: genre, review: review, rating: rating)
+                        let newBook = Book(
+                            title: title.trimmingCharacters(in: .whitespacesAndNewlines),
+                            author: author.trimmingCharacters(in: .whitespacesAndNewlines),
+                            genre: genre,
+                            review: review.trimmingCharacters(in: .whitespacesAndNewlines),
+                            rating: rating
+                        )
                         modelContext.insert(newBook)
                         dismiss()
                     }
+                    .disabled(title.trimmingCharacters(in: .whitespaces).isEmpty ||
+                              author.trimmingCharacters(in: .whitespaces).isEmpty ||
+                              genre.isEmpty)
                 }
             }
             .navigationTitle("Add Book")

@@ -29,9 +29,11 @@ struct ContentView: View {
                                 .font(.largeTitle)
 
                             VStack(alignment: .leading) {
-                                Text(book.title)
+                                Text(book.title.isEmpty ? "Untitled Book" : book.title)
                                     .font(.headline)
-                                Text(book.author)
+                                    .foregroundColor(book.rating == 1 ? .red : .primary)
+
+                                Text(book.author.isEmpty ? "Unknown Author" : book.author)
                                     .foregroundStyle(.secondary)
                             }
                         }
@@ -39,6 +41,7 @@ struct ContentView: View {
                 }
                 .onDelete(perform: deleteBooks)
             }
+
             .navigationDestination(for: Book.self) { book in
                 DetailView(book: book)
             }
