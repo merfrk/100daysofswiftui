@@ -1,49 +1,40 @@
-//
-//  AddView.swift
-//  IExpense
-//
-//  Created by Omer on 22.06.2025.
-//
-
 import SwiftUI
+import SwiftData
 
 struct AddView: View {
-    
     @Environment(\.dismiss) var dismiss
-    
+    @Environment(\.modelContext) var modelContext
+
     @State private var name = ""
     @State private var type = "Personal"
     @State private var amount = 0.0
-    
-    var expenses: Expenses
-    
-    let types = ["Business","Personal"]
-    
+
+    let types = ["Business", "Personal"]
+
     var body: some View {
-        NavigationStack{
-            Form{
+        NavigationStack {
+            Form {
                 TextField("Name", text: $name)
-                
-                Picker("Type", selection: $type){
-                    ForEach(types, id: \.self){
+                    .textInputAutocapitalization(.words)
+
+                Picker("Type", selection: $type) {
+                    ForEach(types, id: \.self) {
                         Text($0)
                     }
                 }
+
                 TextField("Amount", value: $amount, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
                     .keyboardType(.decimalPad)
-                    .navigationTitle("Add new expense")
-                    .toolbar{
-                        Button("Save"){
-                            let item = ExpenseItem(name: name, type: type, amount: amount)
-                            expenses.items.append(item)
-                            dismiss()
-                        }
-                    }
+            }
+            .navigationTitle("Add New Expense")
+            .toolbar {
+                Button("Save") {
+                    let newItem = ExpenseItem(name: name, type: type, amount: amount)
+                    modelContext.insert(newItem)
+                    dismiss()
+                }
+                .disabled(name.isEmpty || amount <= 0)
             }
         }
     }
-}
-
-#Preview {
-    AddView(expenses: Expenses())
 }

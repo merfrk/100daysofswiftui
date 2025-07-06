@@ -12,6 +12,8 @@
 		FC5FB9392E0811930059EB7F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FC5FB9382E0811930059EB7F /* Assets.xcassets */; };
 		FC5FB93C2E0811930059EB7F /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FC5FB93B2E0811930059EB7F /* Preview Assets.xcassets */; };
 		FC5FB9452E082B550059EB7F /* AddView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC5FB9442E082B550059EB7F /* AddView.swift */; };
+		FC83EFE32E1ADAFD009CB8EB /* ExpenseItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC83EFE22E1ADAFD009CB8EB /* ExpenseItem.swift */; };
+		FC83EFE52E1ADCD4009CB8EB /* ExpenseRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC83EFE42E1ADCD4009CB8EB /* ExpenseRow.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -21,6 +23,8 @@
 		FC5FB9382E0811930059EB7F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		FC5FB93B2E0811930059EB7F /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		FC5FB9442E082B550059EB7F /* AddView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddView.swift; sourceTree = "<group>"; };
+		FC83EFE22E1ADAFD009CB8EB /* ExpenseItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpenseItem.swift; sourceTree = "<group>"; };
+		FC83EFE42E1ADCD4009CB8EB /* ExpenseRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpenseRow.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -37,6 +41,7 @@
 		FC5FB9282E0811900059EB7F = {
 			isa = PBXGroup;
 			children = (
+				FC83EFE42E1ADCD4009CB8EB /* ExpenseRow.swift */,
 				FC5FB9332E0811900059EB7F /* IExpense */,
 				FC5FB9322E0811900059EB7F /* Products */,
 			);
@@ -55,6 +60,7 @@
 			children = (
 				FC5FB9342E0811900059EB7F /* IExpenseApp.swift */,
 				FC5FB9362E0811900059EB7F /* ContentView.swift */,
+				FC83EFE22E1ADAFD009CB8EB /* ExpenseItem.swift */,
 				FC5FB9442E082B550059EB7F /* AddView.swift */,
 				FC5FB9382E0811930059EB7F /* Assets.xcassets */,
 				FC5FB93A2E0811930059EB7F /* Preview Content */,
@@ -142,7 +148,9 @@
 			files = (
 				FC5FB9372E0811900059EB7F /* ContentView.swift in Sources */,
 				FC5FB9352E0811900059EB7F /* IExpenseApp.swift in Sources */,
+				FC83EFE52E1ADCD4009CB8EB /* ExpenseRow.swift in Sources */,
 				FC5FB9452E082B550059EB7F /* AddView.swift in Sources */,
+				FC83EFE32E1ADAFD009CB8EB /* ExpenseItem.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
