@@ -1,37 +1,55 @@
-//
-//  ContentView.swift
-//  IExpense
-//
-//  Created by Omer on 22.06.2025.
-//
-
 import SwiftUI
 import SwiftData
 
+enum SortOrder: String, CaseIterable, Identifiable {
+    case byDate = "Date"
+    case byName = "Name"
+    case byAmount = "Amount"
+
+    var id: String { rawValue }
+}
+
 struct ContentView: View {
     @Environment(\.modelContext) var modelContext
-    @Query(sort: \ExpenseItem.date, order: .reverse) var items: [ExpenseItem]
-    
-    @State private var showingAddExpense = false
+    @State private var sortOrder: SortOrder = .byDate
+
+    @Query var allItems: [ExpenseItem]  // sabit, sıralama içeride yapılır
+
+    var sortedItems: [ExpenseItem] {
+        switch sortOrder {
+        case .byDate:
+            return allItems.sorted { $0.date > $1.date }
+        case .byName:
+            return allItems.sorted { $0.name < $1.name }
+        case .byAmount:
+            return allItems.sorted { $0.amount > $1.amount }
+        }
+    }
 
     var body: some View {
         NavigationStack {
-            List {
-                Section("Business") {
-                    ForEach(businessItems) { item in
-                        ExpenseRow(item: item)
-                    }
-                    .onDelete { indexSet in
-                        deleteItems(indexSet, from: businessItems)
+            VStack {
+                Picker("Sort by", selection: $sortOrder) {
+                    ForEach(SortOrder.allCases) { order in
+                        Text(order.rawValue)
                     }
                 }
+                .pickerStyle(.segmented)
+                .padding()
 
-                Section("Personal") {
-                    ForEach(personalItems) { item in
-                        ExpenseRow(item: item)
+                List {
+                    Section("Business") {
+                        ForEach(businessItems) { item in
+                            ExpenseRow(item: item)
+                        }
+                        .onDelete { deleteItems($0, from: businessItems) }
                     }
-                    .onDelete { indexSet in
-                        deleteItems(indexSet, from: personalItems)
+
+                    Section("Personal") {
+                        ForEach(personalItems) { item in
+                            ExpenseRow(item: item)
+                        }
+                        .onDelete { deleteItems($0, from: personalItems) }
                     }
                 }
             }
@@ -49,11 +67,11 @@ struct ContentView: View {
     }
 
     var businessItems: [ExpenseItem] {
-        items.filter { $0.type == "Business" }
+        sortedItems.filter { $0.type == "Business" }
     }
 
     var personalItems: [ExpenseItem] {
-        items.filter { $0.type == "Personal" }
+        sortedItems.filter { $0.type == "Personal" }
     }
 
     func deleteItems(_ offsets: IndexSet, from list: [ExpenseItem]) {
@@ -64,6 +82,6 @@ struct ContentView: View {
     }
 }
 
-#Preview {
+#Preview{
     ContentView()
 }

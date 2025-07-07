@@ -28,6 +28,7 @@ struct ExpenseRow: View {
                 .foregroundColor(item.amountColor)
                 .font(item.amountFont)
         }
+        .padding()
     }
 }
 
@@ -47,4 +48,7 @@ extension ExpenseItem {
         default: return .title3.weight(.bold)
         }
     }
+}
+#Preview{
+    ExpenseRow(item: ExpenseItem(name: "name", type: "Personal", amount: 255, date: .now))
 }
