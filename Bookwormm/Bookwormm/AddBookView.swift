@@ -15,6 +15,13 @@ struct AddBookView: View {
     @State private var rating = 3
     @State private var genre = "Fantasy"
     @State private var review = ""
+    private var hasEverythingFilled: Bool{
+        if title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || author.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || review.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty{
+            return false
+        } else{
+            return true
+        }
+    }
     let genres = ["Fantasy", "Horror", "Kids", "Mystery", "Poetry", "Romance", "Thriller"]
     @Environment(\.dismiss) var dismiss
     
@@ -45,6 +52,7 @@ struct AddBookView: View {
                         dismiss()
                     }
                 }
+                .disabled(!hasEverythingFilled)
                 .navigationTitle(Text("Add Book"))
             }
         }

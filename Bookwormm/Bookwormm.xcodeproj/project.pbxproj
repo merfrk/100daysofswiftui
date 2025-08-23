@@ -6,8 +6,13 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		FCCA0D062E59AD2E0097732D /* EditBookView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCCA0D052E59AD2E0097732D /* EditBookView.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		FCCA0CE92E584CD50097732D /* Bookwormm.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Bookwormm.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		FCCA0D052E59AD2E0097732D /* EditBookView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditBookView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -32,6 +37,7 @@
 		FCCA0CE02E584CD50097732D = {
 			isa = PBXGroup;
 			children = (
+				FCCA0D052E59AD2E0097732D /* EditBookView.swift */,
 				FCCA0CEB2E584CD50097732D /* Bookwormm */,
 				FCCA0CEA2E584CD50097732D /* Products */,
 			);
@@ -119,6 +125,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FCCA0D062E59AD2E0097732D /* EditBookView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

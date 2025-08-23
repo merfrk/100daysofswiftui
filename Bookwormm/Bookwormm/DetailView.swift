@@ -12,6 +12,8 @@ struct DetailView: View {
     @Environment(\.modelContext) var modelContext
     @Environment(\.dismiss) var dismiss
     @State private var showingDeleteAlert = false
+    @State private var showingEditScreen = false
+    
     
     var body: some View {
         ScrollView(){
@@ -36,6 +38,10 @@ struct DetailView: View {
             Text(book.review)
                 .padding()
             
+            Text(book.date.formatted(date: .abbreviated, time: .shortened))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            
             RatingView(rating: .constant(book.rating))
                 .font(.largeTitle)
         }
@@ -49,8 +55,17 @@ struct DetailView: View {
             Text("Are you sure ?")
         }
         .toolbar{
+            Button("Edit", systemImage: "pencil"){
+                showingEditScreen = true
+            }
+            
             Button("Delete this book", systemImage: "trash"){
                 showingDeleteAlert = true
+            }
+        }
+        .sheet(isPresented: $showingEditScreen){
+            NavigationStack{
+                EditBookView(book: book)
             }
         }
     }
