@@ -26,7 +26,6 @@ struct ContentView: View {
         SortDescriptor(\ExpenseItem.name),
         SortDescriptor(\ExpenseItem.amount)
     ]
-    @State private var showNameOnly = true
     @State private var selectedFilter: ExpenseFilter = .all
     @State private var showingAddExpense = false
     
@@ -69,7 +68,7 @@ struct ContentView: View {
                                     SortDescriptor(\ExpenseItem.name)
                                 ])
                         }
-                    }   
+                    }
             }
             .sheet(isPresented: $showingAddExpense) {
                 AddView()
@@ -90,15 +89,7 @@ struct ContentView: View {
         }
         
         // Apply sorting
-        return filtered.sorted { first, second in
-            for descriptor in sortOrder {
-                let result = descriptor.compare(first, second)
-                if result != .orderedSame {
-                    return result == .orderedAscending
-                }
-            }
-            return false
-        }
+        return filtered.sorted(using: sortOrder)
     }
     
     func deleteExpenses(offsets: IndexSet) {
