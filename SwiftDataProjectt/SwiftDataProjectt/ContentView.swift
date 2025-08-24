@@ -4,6 +4,7 @@
 //
 //  Created by Omer on 23.08.2025.
 //
+
 import SwiftData
 import SwiftUI
 
@@ -59,3 +60,4 @@ struct ContentView: View {
 #Preview {
     ContentView()
 }
+
