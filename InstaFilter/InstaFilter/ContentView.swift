@@ -4,6 +4,8 @@
 //
 //  Created by Omer on 25.08.2025.
 //
+import CoreImage
+import CoreImage.CIFilterBuiltins
 import PhotosUI
 import SwiftUI
 
