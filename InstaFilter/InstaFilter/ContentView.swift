@@ -7,6 +7,7 @@
 import CoreImage
 import CoreImage.CIFilterBuiltins
 import PhotosUI
+import StoreKit
 import SwiftUI
 
 struct ContentView: View {
@@ -16,6 +17,8 @@ struct ContentView: View {
     @State private var selectedItem: PhotosPickerItem?
     @State private var currentFilter: CIFilter = CIFilter.sepiaTone()
     @State private var showingFilters = false
+    @AppStorage("filterCount") var filterCount = 0
+    @Environment(\.requestReview) var requestReview
 
     let context = CIContext()
     
@@ -45,7 +48,12 @@ struct ContentView: View {
                 
                 HStack{
                     Button("Change Filter", action: changeFilter)
+                    
                     Spacer()
+                    
+                    if let processedImage{
+                        ShareLink(item: processedImage, preview: SharePreview("InstaFilter image", image: processedImage))
+                    }
                 }
             }
             .padding([.horizontal, .bottom])
@@ -80,8 +88,8 @@ struct ContentView: View {
         let inputKeys = currentFilter.inputKeys
 
         if inputKeys.contains(kCIInputIntensityKey) { currentFilter.setValue(filterIntensity, forKey: kCIInputIntensityKey) }
-        if inputKeys.contains(kCIInputRadiusKey) { currentFilter.setValue(filterIntensity * 2000, forKey: kCIInputRadiusKey) }
-        if inputKeys.contains(kCIInputScaleKey) { currentFilter.setValue(filterIntensity * 100, forKey: kCIInputScaleKey) }
+        if inputKeys.contains(kCIInputRadiusKey) { currentFilter.setValue(filterIntensity * 200, forKey: kCIInputRadiusKey) }
+        if inputKeys.contains(kCIInputScaleKey) { currentFilter.setValue(filterIntensity * 10, forKey: kCIInputScaleKey) }
         
         guard let outputImage = currentFilter.outputImage else { return }
         guard let cgImage = context.createCGImage(outputImage, from: outputImage.extent) else { return }
@@ -92,6 +100,11 @@ struct ContentView: View {
     func setFilter(_ filter: CIFilter){
         currentFilter = filter
         loadImage()
+        filterCount += 1
+        if filterCount >= 3{
+            requestReview()
+            filterCount = 0
+        }
     }
 }
 
