@@ -16,6 +16,13 @@ extension ContentView {
         let savePath = URL.documentsDirectory.appending(path: "SavedPlaces")
         var isUnlocked = false
         
+        struct AuthError: Identifiable {
+            let id = UUID()
+            let message: String
+        }
+        
+         var authError: String?
+        
         init() {
             do {
                 let data = try Data(contentsOf: savePath)
@@ -52,22 +59,26 @@ extension ContentView {
         func authenticate() {
             let context = LAContext()
             var error: NSError?
-
+            
             if context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error) {
                 let reason = "Please authenticate yourself to unlock your places."
-
-                context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason) { success, authenticationError in
-
+                
+                context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason) { success, evaluationError in
+                    
                     Task{ @MainActor in
                         if success {
                             self.isUnlocked = true
+                        } else if let evaluationError = evaluationError {
+                            self.authError = evaluationError.localizedDescription
                         } else {
-                            // error
+                            self.authError = "Authentication failed."
                         }
                     }
                 }
+            } else if let error = error {
+                authError = error.localizedDescription
             } else {
-                // no biometrics
+                authError = "Biometrics not available."
             }
         }
     }
