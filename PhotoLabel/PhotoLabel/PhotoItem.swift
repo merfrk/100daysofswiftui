@@ -8,7 +8,7 @@ import SwiftData
 import Foundation
 
 @Model
-class PhotoItem {
+class PhotoItem{
     var id: UUID
     var name: String
     var imageData: Data?

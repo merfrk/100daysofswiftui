@@ -16,19 +16,21 @@ struct ContentView: View {
         NavigationStack{
             List{
                 ForEach(photos){ photo in
-                    HStack{
-                        if let imageData = photo.imageData, let uiimage = UIImage(data: imageData) {
-                            Image(uiImage: uiimage)
-                                .resizable()
-                                .scaledToFit( )
-                                .frame(width: 50, height: 50)
-                                .clipShape(RoundedRectangle(cornerRadius: 5))
-                        } else{
-                            Text("No Photo")
-                        }
-                        VStack(alignment: .leading){
-                            Text(photo.name)
-                                .font(.headline)
+                    NavigationLink(destination: DetailView(photoItem: photo)){
+                        HStack{
+                            if let imageData = photo.imageData, let uiimage = UIImage(data: imageData) {
+                                Image(uiImage: uiimage)
+                                    .resizable()
+                                    .scaledToFit( )
+                                    .frame(width: 50, height: 50)
+                                    .clipShape(RoundedRectangle(cornerRadius: 5))
+                            } else{
+                                Text("No Photo")
+                            }
+                            VStack(alignment: .leading){
+                                Text(photo.name)
+                                    .font(.headline)
+                            }
                         }
                     }
                 }
@@ -58,6 +60,6 @@ struct ContentView: View {
     }
 }
 
-#Preview {
-    ContentView()
-}
+//#Preview {
+//    ContentView()
+//}

@@ -6,7 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		FC6010A62E68D31500F7FA8A /* DetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC6010A52E68D31500F7FA8A /* DetailView.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
+		FC6010A52E68D31500F7FA8A /* DetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailView.swift; sourceTree = "<group>"; };
 		FC7CF9542E663CCE009DD742 /* PhotoLabel.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PhotoLabel.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -32,6 +37,7 @@
 		FC7CF94B2E663CCE009DD742 = {
 			isa = PBXGroup;
 			children = (
+				FC6010A52E68D31500F7FA8A /* DetailView.swift */,
 				FC7CF9562E663CCE009DD742 /* PhotoLabel */,
 				FC7CF9552E663CCE009DD742 /* Products */,
 			);
@@ -119,6 +125,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FC6010A62E68D31500F7FA8A /* DetailView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
