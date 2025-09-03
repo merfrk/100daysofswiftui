@@ -11,11 +11,13 @@ import Foundation
 class PhotoItem {
     var id: UUID
     var name: String
-    var fileName: String
+    var imageData: Data?
     
-    init(name: String, fileName: String) {
+    init(name: String, imageData: Data) {
         self.id = UUID()
         self.name = name
-        self.fileName = fileName
+        self.imageData = imageData
     }
 }
+
+
