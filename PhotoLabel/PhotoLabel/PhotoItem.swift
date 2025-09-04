@@ -12,6 +12,8 @@ class PhotoItem{
     var id: UUID
     var name: String
     var imageData: Data?
+    var latitude: Double?
+    var longitude: Double?
     
     init(name: String, imageData: Data) {
         self.id = UUID()
