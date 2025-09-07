@@ -4,9 +4,15 @@
 //
 //  Created by Omer on 3.09.2025.
 //
-import PhotosUI
 import SwiftUI
+import PhotosUI
 import MapKit
+import CoreLocation
+
+struct IdentifiableCoordinate: Identifiable {
+    let id = UUID()
+    let coordinate: CLLocationCoordinate2D
+}
 
 struct AddView: View {
     @Environment(\.modelContext) var modelContext
@@ -16,87 +22,103 @@ struct AddView: View {
     @State private var name = ""
     @State private var imageData: Data?
     
-    @State private var cameraPosition: MapCameraPosition = .region(
-        MKCoordinateRegion(
-            center: CLLocationCoordinate2D(latitude: 39.9255, longitude: 32.8663), // Ankara default
-            span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
-        )
-    )
     @State private var selectedCoordinate: CLLocationCoordinate2D?
+    @State private var region = MKCoordinateRegion(
+        center: CLLocationCoordinate2D(latitude: 39.9255, longitude: 32.8663), // varsayılan Ankara
+        span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+    )
     
     private let locationFetcher = LocationFetcher()
     
     var body: some View {
-        NavigationStack{
-            VStack(spacing: 20){
-                if let imageData, let uiImage = UIImage(data: imageData) {
-                    Image(uiImage: uiImage)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 200, height: 200)
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
-                }
-                PhotosPicker(selection: $selectedItem, matching: .images){
-                    Text("Choose an image")
-                }
-                .onChange(of: selectedItem) {
-                    Task{
-                        if let data = try? await selectedItem?.loadTransferable(type: Data.self){
-                            self.imageData = data
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 20) {
+                    
+                    // Fotoğraf önizleme
+                    if let imageData, let uiImage = UIImage(data: imageData) {
+                        Image(uiImage: uiImage)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 200, height: 200)
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                    }
+                    
+                    // Fotoğraf seçici
+                    PhotosPicker(selection: $selectedItem, matching: .images) {
+                        Text("Choose an image")
+                    }
+                    .onChange(of: selectedItem) {
+                        Task {
+                            if let data = try? await selectedItem?.loadTransferable(type: Data.self) {
+                                self.imageData = data
+                            }
                         }
                     }
-                }
-                TextField("Photo name", text: $name)
-                    .textFieldStyle(.roundedBorder)
-                    .padding()
-                
-                Map(position: $cameraPosition, interactionModes: .all) {
-                    if let coord = selectedCoordinate {
-                        Marker("Selected Location", coordinate: coord)
+                    
+                    // İsim
+                    TextField("Photo name", text: $name)
+                        .textFieldStyle(.roundedBorder)
+                        .padding()
+                    
+                    // Harita
+                    Map(
+                        coordinateRegion: $region,
+                        interactionModes: .all,
+                        annotationItems: selectedCoordinate.map { [IdentifiableCoordinate(coordinate: $0)] } ?? []
+                    ) { item in
+                        MapMarker(coordinate: item.coordinate, tint: .red)
                     }
-                }
-                .frame(height: 300)
-                .cornerRadius(10)
-                .gesture(
-                    TapGesture().onEnded { _ in
-                        if let center = cameraPosition.region?.center {
-                            selectedCoordinate = center
-                        }
-                    }
-                )
-                
-                Button("Save"){
-                    if let imageData = imageData, !name.isEmpty{
-                        let coord = selectedCoordinate ?? locationFetcher.lastKnownLocation
-                        let newItem = PhotoItem(name: name, imageData: imageData)
-                        newItem.latitude = coord?.latitude
-                        newItem.longitude = coord?.longitude
-                        
-                        do {
-                            DispatchQueue.main.async{
+                    .frame(height: 300)
+                    .cornerRadius(10)
+                    .gesture(
+                        LongPressGesture(minimumDuration: 0.5)
+                            .onEnded { _ in
+                                // Haritanın ortasını seç
+                                selectedCoordinate = region.center
+                            }
+                    )
+                    
+                    // Save butonu
+                    Button("Save") {
+                        if let imageData = imageData, !name.isEmpty {
+                            let coord = selectedCoordinate ?? locationFetcher.lastKnownLocation
+                            
+                            let newItem = PhotoItem(name: name, imageData: imageData)
+                            newItem.latitude = coord?.latitude
+                            newItem.longitude = coord?.longitude
+                            
+                            DispatchQueue.main.async {
                                 modelContext.insert(newItem)
                                 try? modelContext.save()
+                                dismiss()
                             }
-                        } catch {
-                            print("Save failed: \(error.localizedDescription)")
                         }
-                        dismiss()
                     }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(name.isEmpty || imageData == nil || (selectedCoordinate == nil && locationFetcher.lastKnownLocation == nil))
                 }
-                .buttonStyle(.borderedProminent)
-                .disabled(name.isEmpty || imageData == nil)
+                .padding()
             }
             .navigationTitle("Add new photo")
-            .toolbar{
+            .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {
                         dismiss()
                     }
                 }
             }
+            .onAppear {
+                locationFetcher.start()
+                if let coord = locationFetcher.lastKnownLocation {
+                    region.center = coord
+                    selectedCoordinate = coord
+                }
+            }
         }
     }
 }
+
 
 #Preview {
     AddView()
