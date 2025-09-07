@@ -14,7 +14,7 @@ struct ProspectsView: View {
         case none, contacted, uncontacted
     }
     enum SortType{
-        case name, email
+        case name, email, date
     }
     
     let filter: FilterType
@@ -39,7 +39,9 @@ struct ProspectsView: View {
         switch sortType{
             case .name: return prospects.sorted(using: [SortDescriptor(\Prospect.name),SortDescriptor(\Prospect.emailAddress)])
         case .email: return prospects.sorted(using: [SortDescriptor(\Prospect.emailAddress),SortDescriptor(\Prospect.name)])
+        case .date: return prospects.sorted(using: [SortDescriptor(\Prospect.createdAt),SortDescriptor(\Prospect.name)])
         }
+        
     }
     
     var body: some View {
@@ -106,6 +108,8 @@ struct ProspectsView: View {
                                 .tag(SortType.name)
                             Text("Sort By email address")
                                 .tag(SortType.email)
+                            Text("Sort By Date")
+                                .tag(SortType.date)
                         }
                     }
                 }

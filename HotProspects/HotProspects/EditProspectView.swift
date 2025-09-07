@@ -23,7 +23,7 @@ struct EditProspectView: View {
             ToolbarItem(placement: .confirmationAction){
                 Button("Save"){
                     do { try modelContext.save() } catch { print(error) }
-                                        dismiss()
+                    dismiss()
                 }
             }
         }
