@@ -13,6 +13,9 @@ struct ProspectsView: View {
     enum FilterType{
         case none, contacted, uncontacted
     }
+    enum SortType{
+        case name, email
+    }
     
     let filter: FilterType
     var title: String {
@@ -25,19 +28,35 @@ struct ProspectsView: View {
             "Uncontacted people"
         }
     }
-    @Query(sort: \Prospect.name) var prospects: [Prospect]
+    @Query var prospects: [Prospect]
     @Environment(\.modelContext) var modelContext
     @State private var isShowingScanner = false
     @State private var selectedProspects = Set<Prospect>()
+    @State private var editMode: EditMode = .inactive
+    @State private var sortType: SortType = .name
+    
+    var displayedProspects: [Prospect] {
+        switch sortType{
+            case .name: return prospects.sorted(using: [SortDescriptor(\Prospect.name),SortDescriptor(\Prospect.emailAddress)])
+        case .email: return prospects.sorted(using: [SortDescriptor(\Prospect.emailAddress),SortDescriptor(\Prospect.name)])
+        }
+    }
     
     var body: some View {
         NavigationStack {
-            List(prospects, selection: $selectedProspects){prospect in
-                VStack(alignment: .leading){
-                    Text(prospect.name)
-                        .font(.headline)
-                    Text(prospect.emailAddress)
-                        .foregroundStyle(.secondary)
+            List(displayedProspects, selection: $selectedProspects){prospect in
+                HStack{
+                    VStack(alignment: .leading){
+                        Text(prospect.name)
+                            .font(.headline)
+                        Text(prospect.emailAddress)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    if filter == .none{
+                        Image(systemName: prospect.isContacted ? "person.crop.circle.badge.checkmark" : "person.crop.circle.badge.xmark" )
+                            .foregroundColor(prospect.isContacted ? .green : .gray)
+                    }
                 }
                 .swipeActions {
                     Button("Delete", systemImage: "trash", role: .destructive) {
@@ -61,48 +80,69 @@ struct ProspectsView: View {
                 }
                 .tag(prospect)
             }
-                .navigationTitle(title)
-                .toolbar{
-                    
-                    ToolbarItem(placement: .topBarTrailing){
-                        Button("Scan", systemImage: "qrcode.viewfinder"){
-                            isShowingScanner = true
-                        }
+            .navigationTitle(title)
+            .toolbar{
+                
+                ToolbarItem(){
+                    Button("Scan", systemImage: "qrcode.viewfinder"){
+                        isShowingScanner = true
                     }
-                    ToolbarItem(placement: .topBarLeading) {
-                        EditButton()
+                }
+                ToolbarItem(placement: .topBarLeading) {
+                    EditButton()
+                }
+                if editMode == .active && !selectedProspects.isEmpty {
+                    ToolbarItem(placement: .bottomBar) {
+                        Button("Delete Selected", action: delete)
                     }
-                    if selectedProspects.isEmpty == false {
-                        ToolbarItem(placement: .bottomBar) {
-                            Button("Delete Selected", action: delete)
+                }
+                ToolbarItem(placement: .topBarTrailing){
+                    Menu("Sort", systemImage: "arrow.up.arrow.down"){
+                        Picker("Sort", selection: $sortType){
+                            Text("Sort By Name")
+                                .tag(SortType.name)
+                            Text("Sort By email address")
+                                .tag(SortType.email)
                         }
                     }
                 }
-                .sheet(isPresented: $isShowingScanner) {
-                    CodeScannerView(codeTypes: [.qr], simulatedData: "Paul Hudson\npaul@hackingwithswift.com", completion: handleScan)
-                }
+            }
+            .environment(\.editMode, $editMode)
+            .sheet(isPresented: $isShowingScanner) {
+                CodeScannerView(codeTypes: [.qr], simulatedData: "Paul Hudson\npaul@hackingwithswift.com", completion: handleScan)
+            }
             
         }
     }
     init(filter: FilterType){
         self.filter = filter
+        
         if filter != .none{
             let showContactedOnly = filter == .contacted
             _prospects = Query(filter: #Predicate{
                 $0.isContacted == showContactedOnly
-            }, sort: [SortDescriptor(\Prospect.name)])
+            })
         }
     }
+    
     func handleScan(result: Result<ScanResult, ScanError>) {
-       isShowingScanner = false
+        
+        isShowingScanner = false
         switch result {
         case .success(let result):
             let details = result.string.components(separatedBy: "\n")
             guard details.count == 2 else { return }
-
+            
             let person = Prospect(name: details[0], emailAddress: details[1], isContacted: false)
-
+            
             modelContext.insert(person)
+            
+            do {
+                try modelContext.save()
+            } catch {
+                print("Failed to save scanned person:", error)
+            }
+            
         case .failure(let error):
             print("Scanning failed: \(error.localizedDescription)")
         }
@@ -111,6 +151,7 @@ struct ProspectsView: View {
         for prospect in selectedProspects {
             modelContext.delete(prospect)
         }
+        selectedProspects.removeAll()
     }
     func addNotification(for prospect: Prospect) {
         let center = UNUserNotificationCenter.current()
@@ -121,11 +162,11 @@ struct ProspectsView: View {
             content.subtitle = prospect.emailAddress
             content.sound = .default
             
-//            var dateComponents = DateComponents()
-//            dateComponents.hour = 9
-//            let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: false)
+            //            var dateComponents = DateComponents()
+            //            dateComponents.hour = 9
+            //            let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: false)
             let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
-
+            
             let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
             center.add(request)
         }
@@ -147,5 +188,5 @@ struct ProspectsView: View {
 }
 
 #Preview {
-    ProspectsView(filter: .contacted)
+    ProspectsView(filter: .none)
 }
