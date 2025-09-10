@@ -23,11 +23,13 @@ struct ContentView: View {
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     @Environment(\.scenePhase) var scenePhase
     @State private var isActive = true
+    
     var body: some View {
         ZStack {
             Image(decorative: "background")
                 .resizable()
                 .ignoresSafeArea()
+            
             VStack {
                 Text("Time: \(timeRemaining)")
                     .font(.largeTitle)
@@ -36,17 +38,18 @@ struct ContentView: View {
                     .padding(.vertical, 5)
                     .background(.black.opacity(0.75))
                     .clipShape(.capsule)
+                
                 ZStack {
-                    ForEach(0..<cards.count, id: \.self) { index in
-                        CardView(card: cards[index]){
+                    // ✅ Enumerated ile index’i önceden hesaplıyoruz
+                    ForEach(Array(cards.enumerated()), id: \.element.id) { idx, card in
+                        CardView(card: card) { correct in
                             withAnimation {
-                                removeCard(at: index)
+                                removeCard(card, correct: correct)
                             }
                         }
-                        .stacked(at: index, in: cards.count)
-                        .allowsHitTesting(index == cards.count - 1)
-                        .accessibilityHidden(index < cards.count - 1)
-                        
+                        .stacked(at: idx, in: cards.count)
+                        .allowsHitTesting(idx == cards.count - 1)
+                        .accessibilityHidden(idx != cards.count - 1)
                     }
                 }
                 .allowsHitTesting(timeRemaining > 0)
@@ -59,6 +62,7 @@ struct ContentView: View {
                         .clipShape(.capsule)
                 }
             }
+            
             VStack {
                 HStack {
                     Spacer()
@@ -84,7 +88,9 @@ struct ContentView: View {
                     HStack {
                         Button {
                             withAnimation {
-                                removeCard(at: cards.count - 1)
+                                if let card = cards.last {
+                                    removeCard(card, correct: false) // ❌ wrong
+                                }
                             }
                         } label: {
                             Image(systemName: "xmark.circle")
@@ -99,7 +105,9 @@ struct ContentView: View {
                         
                         Button {
                             withAnimation {
-                                removeCard(at: cards.count - 1)
+                                if let card = cards.last {
+                                    removeCard(card, correct: true) // ✅ correct
+                                }
                             }
                         } label: {
                             Image(systemName: "checkmark.circle")
@@ -116,7 +124,7 @@ struct ContentView: View {
                 }
             }
         }
-        .onReceive(timer) { time in
+        .onReceive(timer) { _ in
             guard isActive else { return }
             if timeRemaining > 0 {
                 timeRemaining -= 1
@@ -124,7 +132,7 @@ struct ContentView: View {
         }
         .onChange(of: scenePhase) {
             if scenePhase == .active {
-                if !cards.isEmpty{
+                if !cards.isEmpty {
                     isActive = true
                 }
             } else {
@@ -136,19 +144,29 @@ struct ContentView: View {
         }
         .onAppear(perform: resetCards)
     }
-    func removeCard(at index: Int) {
-        guard index >= 0 else { return }
-        
+    
+    func removeCard(_ card: Card, correct: Bool) {
+        guard let index = cards.firstIndex(where: { $0.id == card.id }) else { return }
         cards.remove(at: index)
+        
+        if !correct {
+            // yanlışsa kartı tekrar başa ekle
+            var newCard = card
+                newCard.id = UUID()
+            cards.append(newCard)
+        }
+        
         if cards.isEmpty {
             isActive = false
         }
     }
+    
     func resetCards() {
         timeRemaining = 100
         isActive = true
         loadData()
     }
+    
     func loadData() {
         if let data = UserDefaults.standard.data(forKey: "Cards") {
             if let decoded = try? JSONDecoder().decode([Card].self, from: data) {
@@ -161,3 +179,4 @@ struct ContentView: View {
 #Preview {
     ContentView()
 }
+
