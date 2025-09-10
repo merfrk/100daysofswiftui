@@ -19,7 +19,11 @@ struct EditCards: View {
                 Section("Add new card") {
                     TextField("Prompt", text: $newPrompt)
                     TextField("Answer", text: $newAnswer)
-                    Button("Add Card", action: addCard)
+                    Button("Add Card"){
+                        addCard()
+                        newPrompt = ""
+                        newAnswer = ""
+                    }
                 }
 
                 Section {

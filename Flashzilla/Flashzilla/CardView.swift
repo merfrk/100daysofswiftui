@@ -11,7 +11,7 @@ struct CardView: View {
     @Environment(\.accessibilityDifferentiateWithoutColor) var
     accessibilityDifferentiateWithoutColor
     @Environment(\.accessibilityVoiceOverEnabled) var accessibilityVoiceOverEnabled
-
+    
     let card: Card
     var removal: (() -> Void)? = nil
     @State private var isShowingAnswer = false
@@ -21,36 +21,36 @@ struct CardView: View {
         ZStack {
             RoundedRectangle(cornerRadius: 25)
                 .fill(
-                        accessibilityDifferentiateWithoutColor
-                            ? .white
-                            : .white
-                                .opacity(1 - Double(abs(offset.width / 50)))
-
-                    )
-                    .background(
-                        accessibilityDifferentiateWithoutColor
-                            ? nil
-                            : RoundedRectangle(cornerRadius: 25)
-                                .fill(offset.width > 0 ? .green : .red)
-                    )
+                    accessibilityDifferentiateWithoutColor
+                    ? .white
+                    : .white
+                        .opacity(1 - Double(abs(offset.width / 50)))
+                    
+                )
+                .background(
+                    accessibilityDifferentiateWithoutColor
+                    ? nil
+                    : RoundedRectangle(cornerRadius: 25)
+                        .fill(offset.width > 0 ? .green : .red)
+                )
                 .shadow(radius: 10)
             
             VStack {
                 if accessibilityVoiceOverEnabled {
-                       Text(isShowingAnswer ? card.answer : card.prompt)
-                           .font(.largeTitle)
-                           .foregroundStyle(.black)
-                   } else {
-                       Text(card.prompt)
-                           .font(.largeTitle)
-                           .foregroundStyle(.black)
-
-                       if isShowingAnswer {
-                           Text(card.answer)
-                               .font(.title)
-                               .foregroundStyle(.secondary)
-                       }
-                   }
+                    Text(isShowingAnswer ? card.answer : card.prompt)
+                        .font(.largeTitle)
+                        .foregroundStyle(.black)
+                } else {
+                    Text(card.prompt)
+                        .font(.largeTitle)
+                        .foregroundStyle(.black)
+                    
+                    if isShowingAnswer {
+                        Text(card.answer)
+                            .font(.title)
+                            .foregroundStyle(.secondary)
+                    }
+                }
             }
             .padding(20)
             .multilineTextAlignment(.center)
