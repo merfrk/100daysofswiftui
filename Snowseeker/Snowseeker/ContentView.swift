@@ -12,11 +12,13 @@ struct ContentView: View {
     @State private var searchText = ""
     var filteredResorts: [Resort] {
         if searchText.isEmpty {
-           resorts
+            resorts
         } else {
             resorts.filter { $0.name.localizedStandardContains(searchText) }
         }
     }
+    @State private var favorites = Favorites()
+    
     var body: some View {
         NavigationSplitView {
             List(filteredResorts) { resort in
@@ -33,12 +35,18 @@ struct ContentView: View {
                                 RoundedRectangle(cornerRadius: 5)
                                     .stroke(.black, lineWidth: 1)
                             )
-
+                        
                         VStack(alignment: .leading) {
                             Text(resort.name)
                                 .font(.headline)
                             Text("\(resort.runs) runs")
                                 .foregroundStyle(.secondary)
+                        }
+                        if favorites.contains(resort) {
+                            Spacer()
+                            Image(systemName: "heart.fill")
+                            .accessibilityLabel("This is a favorite resort")
+                                .foregroundStyle(.red)
                         }
                     }
                 }
@@ -50,7 +58,9 @@ struct ContentView: View {
             .searchable(text: $searchText, prompt: "Search for a resort")
         } detail: {
             WelcomeView()
-        }    }
+        }
+        .environment(favorites)
+    }
 }
 
 #Preview {
