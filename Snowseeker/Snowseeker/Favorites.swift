@@ -14,12 +14,19 @@ class Favorites {
 
     // the key we're using to read/write in UserDefaults
     private let key = "Favorites"
+    let defaults = UserDefaults.standard
 
     init() {
         // load our saved data
+        if let savedResorts = defaults.array(forKey: key) as? [String] {
+            resorts = Set(savedResorts)
+            
+        }else {
+            resorts = []
+        }
 
-        // still here? Use an empty array
-        resorts = []
+        
+        
     }
 
     // returns true if our set contains this resort
@@ -40,6 +47,6 @@ class Favorites {
     }
 
     func save() {
-        // write out our data
+        defaults.set(Array(resorts), forKey: key)
     }
 }

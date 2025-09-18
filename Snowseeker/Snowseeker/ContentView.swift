@@ -11,13 +11,31 @@ struct ContentView: View {
     let resorts: [Resort] = Bundle.main.decode("resorts.json")
     @State private var searchText = ""
     var filteredResorts: [Resort] {
-        if searchText.isEmpty {
-            resorts
-        } else {
-            resorts.filter { $0.name.localizedStandardContains(searchText) }
+        var list = resorts
+        if !searchText.isEmpty {
+            list = list.filter { $0.name.localizedStandardContains(searchText)}
+        }
+        switch sortType {
+        case .none:
+            return list
+        case .name:
+            return list.sorted { $0.name < $1.name }
+        case .country:
+            return list.sorted { $0.country < $1.country }
         }
     }
     @State private var favorites = Favorites()
+    enum SortType: String, CaseIterable {
+        case none, name, country
+        var title: String {
+            switch self {
+            case .none: "Default"
+            case .name: "Name"
+            case .country: "Country"
+            }
+        }
+    }
+    @State private var sortType: SortType = .none
     
     var body: some View {
         NavigationSplitView {
@@ -45,7 +63,7 @@ struct ContentView: View {
                         if favorites.contains(resort) {
                             Spacer()
                             Image(systemName: "heart.fill")
-                            .accessibilityLabel("This is a favorite resort")
+                                .accessibilityLabel("This is a favorite resort")
                                 .foregroundStyle(.red)
                         }
                     }
@@ -56,6 +74,26 @@ struct ContentView: View {
                 ResortView(resort: resort)
             }
             .searchable(text: $searchText, prompt: "Search for a resort")
+            .toolbar{
+                Menu{
+                    ForEach(SortType.allCases, id: \.self) { type in
+                        Button {
+                                   sortType = type
+                               } label: {
+                                   if sortType == type {
+                                       Label(type.title, systemImage: "checkmark")
+                                   } else {
+                                       Text(type.title)
+                                   }
+                               }
+                        }
+                } label: {
+                    HStack {
+                            Image(systemName: "arrow.up.arrow.down")
+                            Text("Sort: \(sortType.title)")
+                        }
+                }
+            }
         } detail: {
             WelcomeView()
         }
